@@ -247,10 +247,18 @@ function clearMessages() {
   });
 }
 
-document.getElementById("playMusic").onclick = () => {
-  const music = document.getElementById("bgMusic");
-  music.volume = 0.1;
-  music.play();
+const playBtn = document.getElementById("playMusic");
+const bgMusic = document.getElementById("bgMusic");
+
+playBtn.onclick = () => {
+  if (bgMusic.paused) {
+    bgMusic.volume = 0.1;
+    bgMusic.play().catch(() => alert("Interaja com a página para ativar o áudio."));
+    playBtn.textContent = "Pausar música";
+  } else {
+    bgMusic.pause();
+    playBtn.textContent = "Ativar música de fundo";
+  }
 };
 
 document.getElementById("signupForm").onsubmit = e => {
@@ -415,5 +423,3 @@ showMemes();
 
 </body>
 </html>
-
-
