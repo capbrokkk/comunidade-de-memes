@@ -6,42 +6,155 @@
   <title>Comunidade de Memes</title>
   <style>
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; color: #333; min-height: 100vh; display: flex; flex-direction: column; }
-    header { background: #4a90e2; padding: 15px 20px; text-align: center; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; }
-    header h1 { margin: 0; font-weight: 600; font-size: 28px; }
-    #userPic { position: absolute; top: 10px; right: 60px; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white; display: none; cursor: pointer; }
-    #logoutBtn { position: absolute; top: 10px; right: 10px; background: #ff4d4d; color: white; border: none; padding: 8px 10px; border-radius: 5px; cursor: pointer; display: none; font-weight: 600; }
-    nav { display: flex; flex-wrap: wrap; justify-content: center; background: #fff; border-bottom: 1px solid #ddd; }
-    nav button { background: none; border: none; color: #4a90e2; padding: 12px 20px; font-size: 16px; cursor: pointer; transition: background 0.3s ease, color 0.3s ease; border-bottom: 3px solid transparent; }
-    nav button:hover { background: #e6f0fb; }
-    nav button.active { border-bottom: 3px solid #4a90e2; font-weight: 700; }
-    main { flex: 1; padding: 30px 20px; max-width: 900px; margin: auto; width: 100%; }
+    body { margin: 0; font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f9fafb; color: #222; min-height: 100vh; display: flex; flex-direction: column; }
+    header { background: #2563eb; padding: 20px; text-align: center; color: white; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3); position: relative; font-weight: 700; font-size: 28px; letter-spacing: 1px; }
+    #userPic { position: absolute; top: 14px; right: 80px; width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2.5px solid white; display: none; cursor: pointer; transition: box-shadow 0.3s ease; }
+    #userPic:hover { box-shadow: 0 0 8px #60a5fa; }
+    #logoutBtn { position: absolute; top: 14px; right: 14px; background: #ef4444; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; display: none; font-weight: 700; font-size: 15px; box-shadow: 0 3px 6px rgba(239, 68, 68, 0.5); transition: background 0.3s ease; }
+    #logoutBtn:hover { background: #dc2626; }
+    nav { display: flex; flex-wrap: wrap; justify-content: center; background: white; border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 6px rgb(0 0 0 / 0.05); }
+    nav button { background: none; border: none; color: #2563eb; padding: 14px 24px; font-size: 17px; cursor: pointer; transition: background 0.3s ease, color 0.3s ease; font-weight: 600; letter-spacing: 0.04em; border-bottom: 3px solid transparent; }
+    nav button:hover { background: #e0e7ff; }
+    nav button.active { border-bottom: 3px solid #2563eb; font-weight: 800; color: #1e40af; }
+    main { flex: 1; padding: 36px 20px; max-width: 920px; margin: auto; width: 100%; }
     section { display: none; }
     section.active { display: block; }
-    form { max-width: 420px; margin: auto; background: #fff; padding: 25px 30px; border-radius: 8px; box-shadow: 0 2px 6px rgba(74,144,226,0.15); display: flex; flex-direction: column; gap: 15px; }
-    input, textarea { padding: 12px 15px; font-size: 16px; border: 1.5px solid #ccc; border-radius: 6px; transition: border-color 0.3s ease; font-family: inherit; resize: vertical; }
-    input:focus, textarea:focus { outline: none; border-color: #4a90e2; box-shadow: 0 0 5px rgba(74,144,226,0.5); }
-    input[type="submit"], button.submit-btn { background: #4a90e2; color: white; font-weight: 600; cursor: pointer; border: none; padding: 12px 0; border-radius: 6px; font-size: 18px; transition: background 0.3s ease; }
-    input[type="submit"]:hover, button.submit-btn:hover { background: #357ABD; }
-    .message { text-align: center; margin: 10px 0; font-weight: 600; color: #e74c3c; min-height: 20px; }
-    .meme { background: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); position: relative; }
-    .meme video, .meme img { max-width: 100%; border-radius: 10px; cursor: pointer; margin-bottom: 10px; box-shadow: 0 1px 5px rgba(74,144,226,0.2); }
-    .admin-panel { display: none; position: absolute; top: 10px; right: 10px; background: #ff4d4d; padding: 10px; border-radius: 8px; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-    .admin-panel button { display: block; background: white; color: #ff4d4d; border: none; padding: 6px 10px; border-radius: 4px; margin-bottom: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: background 0.2s ease; }
-    .admin-panel button:hover { background: #ff9999; }
-    footer { text-align: center; padding: 15px 10px; background: #f1f3f6; color: #666; font-size: 14px; margin-top: auto; border-top: 1px solid #ddd; }
-    .like-btn { background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 16px; margin-right: 10px; }
-    .report-btn { background: none; border: none; cursor: pointer; color: #f39c12; font-size: 16px; margin-right: 10px; }
-    .comment-section { margin-top: 10px; }
-    .comment-section p { background: #f5f5f5; padding: 5px 8px; border-radius: 5px; margin: 4px 0; font-size: 14px; }
-    .comment-section form { display: flex; gap: 5px; background: none; box-shadow: none; padding: 0; }
-    .comment-section input { flex: 1; }
+    form { max-width: 460px; margin: auto; background: white; padding: 28px 32px; border-radius: 12px; box-shadow: 0 4px 15px rgb(37 99 235 / 0.1); display: flex; flex-direction: column; gap: 18px; }
+    input, textarea { padding: 14px 18px; font-size: 17px; border: 1.7px solid #d1d5db; border-radius: 8px; transition: border-color 0.3s ease, box-shadow 0.3s ease; font-family: inherit; resize: vertical; }
+    input:focus, textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 8px rgb(37 99 235 / 0.3); }
+    input[type="submit"], button.submit-btn { background: #2563eb; color: white; font-weight: 700; cursor: pointer; border: none; padding: 14px 0; border-radius: 10px; font-size: 19px; transition: background 0.3s ease; letter-spacing: 0.04em; }
+    input[type="submit"]:hover, button.submit-btn:hover { background: #1e40af; }
+    .message { text-align: center; margin: 14px 0; font-weight: 700; color: #dc2626; min-height: 22px; font-size: 16px; letter-spacing: 0.02em; }
+    .meme {
+      background: white;
+      padding: 22px 28px;
+      border-radius: 16px;
+      margin-bottom: 26px;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.1);
+      position: relative;
+      transition: transform 0.2s ease;
+      font-size: 16px;
+      line-height: 1.4;
+      color: #111827;
+    }
+    .meme:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(37, 99, 235, 0.15); }
+    .meme video, .meme img, .meme audio {
+      max-width: 100%;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+      display: block;
+    }
+    .meme p {
+      margin: 0 0 10px 0;
+      font-weight: 600;
+      color: #374151;
+      word-wrap: break-word;
+      white-space: pre-line;
+    }
+    .meme small {
+      display: block;
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 14px;
+      user-select: none;
+    }
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    button.like-btn, button.report-btn, button.delete-media-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      user-select: none;
+      color: #6b7280;
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.08);
+    }
+    button.like-btn:hover { background-color: #fee2e2; color: #dc2626; box-shadow: 0 4px 12px rgb(220 38 38 / 0.3); }
+    button.report-btn:hover { background-color: #fef3c7; color: #ca8a04; box-shadow: 0 4px 12px rgb(202 138 4 / 0.3); }
+    button.delete-media-btn:hover { background-color: #fee2e2; color: #b91c1c; box-shadow: 0 4px 12px rgb(185 28 28 / 0.3); }
+    button.delete-report-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 12px;
+      box-shadow: 0 3px 8px rgba(239, 68, 68, 0.5);
+    }
+    button.delete-report-btn:hover { background: #b91c1c; }
+    .comment-section { margin-top: 16px; }
+    .comment-section p {
+      background: #f3f4f6;
+      padding: 10px 14px;
+      border-radius: 12px;
+      margin: 6px 0;
+      font-size: 15px;
+      color: #4b5563;
+      user-select: none;
+    }
+    .comment-section form {
+      display: flex;
+      gap: 10px;
+      background: none;
+      box-shadow: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+    .comment-section input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1.5px solid #d1d5db;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+    .comment-section input:focus { border-color: #2563eb; box-shadow: 0 0 7px rgb(37 99 235 / 0.3); outline: none; }
+    .comment-section button {
+      padding: 10px 18px;
+      border-radius: 12px;
+      background: #2563eb;
+      border: none;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease;
+    }
+    .comment-section button:hover { background: #1e40af; }
+    footer {
+      text-align: center;
+      padding: 18px 10px;
+      background: #e5e7eb;
+      color: #4b5563;
+      font-size: 15px;
+      margin-top: auto;
+      border-top: 1px solid #d1d5db;
+      user-select: none;
+      letter-spacing: 0.04em;
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Comunidade de Memes</h1>
+  Comunidade de Memes
   <img id="userPic" alt="Foto do usuário" />
   <button id="logoutBtn">Sair</button>
 </header>
@@ -112,249 +225,286 @@
 </main>
 
 <footer>
-  &copy; 🔥2025 Comunidade de Memes feita por capkzy🔥💓
+  © 2025 Comunidade de Memes - Feito por capkzy🔥💓
 </footer>
 
-<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
 <script>
+  const tabs = document.querySelectorAll('nav button');
+  const sections = document.querySelectorAll('main section');
   let currentUser = null;
-  let users = JSON.parse(localStorage.getItem("users")) || {};
-  let memes = JSON.parse(localStorage.getItem("memes")) || [];
-  let reports = JSON.parse(localStorage.getItem("reports")) || [];
-  const palavrasProibidas = ["porno","nude","sexo","nsfw","genital"];
+  let users = JSON.parse(localStorage.getItem('users') || '{}');
+  let memes = JSON.parse(localStorage.getItem('memes') || '[]');
+  let reports = JSON.parse(localStorage.getItem('reports') || '[]');
 
-  const myWidget = cloudinary.createUploadWidget({
-    cloudName: 'djeqaxjf1',
-    uploadPreset: 'sfnas6dp'
-  }, (error, result) => {
-    if (!error && result && result.event === "success") {
-      memeFileUrl.value = result.info.secure_url;
-      memeMessage.style.color = "green";
-      memeMessage.textContent = "Upload concluído!";
-    }
+  function saveUsers() { localStorage.setItem('users', JSON.stringify(users)); }
+  function saveMemes() { localStorage.setItem('memes', JSON.stringify(memes)); }
+  function saveReports() { localStorage.setItem('reports', JSON.stringify(reports)); }
+
+  function switchTab(tabName) {
+    sections.forEach(s => s.classList.remove('active'));
+    tabs.forEach(t => t.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    document.querySelector(`nav button[data-tab="${tabName}"]`).classList.add('active');
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      switchTab(tab.dataset.tab);
+      clearMessages();
+      if(tab.dataset.tab === 'memes') renderMemes();
+      if(tab.dataset.tab === 'reports') renderReports();
+    });
   });
 
-  uploadBtn.addEventListener("click", () => { myWidget.open(); }, false);
-
-  function saveData() {
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("memes", JSON.stringify(memes));
-    localStorage.setItem("reports", JSON.stringify(reports));
+  function clearMessages() {
+    document.querySelectorAll('.message').forEach(m => m.textContent = '');
   }
 
-  document.querySelectorAll(".tab-btn").forEach(btn => {
-    btn.onclick = () => {
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
-      document.getElementById(btn.dataset.tab).classList.add("active");
-      ["loginMessage","signupMessage","memeMessage"].forEach(id=>{
-        const el=document.getElementById(id);
-        if(el) el.textContent = "";
-      });
-      if(btn.dataset.tab === "reports") showReports();
-    };
-  });
-
-  function updateUserPic() {
-    if(currentUser && users[currentUser] && users[currentUser].pic){
-      userPic.src = users[currentUser].pic;
-      userPic.style.display = "block";
-      logoutBtn.style.display = "inline-block";
-    } else {
-      userPic.style.display = "none";
-      logoutBtn.style.display = "none";
-    }
-  }
-
-  logoutBtn.onclick = () => {
-    currentUser = null;
-    updateUserPic();
-    alert("Você saiu da conta.");
-  };
-
-  async function hashPassword(password) {
-    const msgUint8 = new TextEncoder().encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
-  signupForm.onsubmit = async e => {
+  document.getElementById('loginForm').addEventListener('submit', e => {
     e.preventDefault();
-    const user = signupUser.value.trim();
-    const pass = signupPass.value;
-    const pic = signupPic.files[0];
-    const msg = signupMessage;
-    if (!user || !pass || !pic) { msg.textContent = "Preencha todos os campos."; msg.style.color = "red"; return; }
-    if (users[user]) { msg.textContent = "Usuário já existe."; msg.style.color = "red"; return; }
-    const hashed = await hashPassword(pass);
+    clearMessages();
+    const user = e.target.loginUser.value.trim();
+    const pass = e.target.loginPass.value;
+    const secret = e.target.loginSecret.value.trim();
+    if (!users[user]) {
+      document.getElementById('loginMessage').textContent = 'Usuário não encontrado.';
+      return;
+    }
+    if(users[user].password !== pass) {
+      document.getElementById('loginMessage').textContent = 'Senha incorreta.';
+      return;
+    }
+    currentUser = {...users[user]};
+    if(secret === 'admin123' && currentUser.isAdmin) {
+      currentUser.isAdmin = true;
+    }
+    else {
+      currentUser.isAdmin = users[user].isAdmin || false;
+    }
+    updateHeader();
+    switchTab('memes');
+  });
+
+  document.getElementById('signupForm').addEventListener('submit', e => {
+    e.preventDefault();
+    clearMessages();
+    const user = e.target.signupUser.value.trim();
+    const pass = e.target.signupPass.value;
+    const fileInput = e.target.signupPic;
+    if(users[user]) {
+      document.getElementById('signupMessage').textContent = 'Usuário já existe.';
+      return;
+    }
+    if(fileInput.files.length === 0) {
+      document.getElementById('signupMessage').textContent = 'Escolha uma foto.';
+      return;
+    }
+    const file = fileInput.files[0];
     const reader = new FileReader();
-    reader.onload = () => {
-      users[user] = { pass: hashed, pic: reader.result, friends: [], followers: [], isAdmin: user === "capkzy", banned: false };
-      saveData();
-      msg.style.color = "green";
-      msg.textContent = "Conta criada!";
-      signupForm.reset();
+    reader.onload = function(evt) {
+      users[user] = {
+        password: pass,
+        photo: evt.target.result,
+        isAdmin: false
+      };
+      saveUsers();
+      document.getElementById('signupMessage').textContent = 'Conta criada! Faça login.';
+      e.target.reset();
+      switchTab('login');
     };
-    reader.readAsDataURL(pic);
-  };
+    reader.readAsDataURL(file);
+  });
 
-  loginForm.onsubmit = async e => {
-    e.preventDefault();
-    const user = loginUser.value.trim();
-    const pass = loginPass.value;
-    const secret = loginSecret.value;
-    const msg = loginMessage;
-    if (!users[user]) { msg.style.color = "red"; msg.textContent = "Usuário não encontrado."; return; }
-    if (users[user].banned) { msg.style.color = "red"; msg.textContent = "Você foi banido."; return; }
-    const hashed = await hashPassword(pass);
-    if (users[user].pass !== hashed) { msg.style.color = "red"; msg.textContent = "Senha incorreta."; return; }
-    if (secret && secret === "3x!AdmC0d3#2025") { users[user].isAdmin = true; saveData(); }
-    currentUser = user;
-    updateUserPic();
-    msg.style.color = "green";
-    msg.textContent = "Logado como " + user;
-    loginForm.reset();
-  };
-
-  function contemConteudoProibido(texto) {
-    const lower = texto.toLowerCase();
-    return palavrasProibidas.some(palavra => lower.includes(palavra));
+  function updateHeader() {
+    const userPic = document.getElementById('userPic');
+    const logoutBtn = document.getElementById('logoutBtn');
+    if(currentUser) {
+      userPic.src = currentUser.photo;
+      userPic.style.display = 'block';
+      logoutBtn.style.display = 'block';
+    } else {
+      userPic.style.display = 'none';
+      logoutBtn.style.display = 'none';
+    }
   }
 
-  memeForm.onsubmit = e => {
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    currentUser = null;
+    updateHeader();
+    switchTab('login');
+  });
+
+  document.getElementById('uploadBtn').addEventListener('click', () => {
+    alert('Aqui você pode implementar upload via Cloudinary ou outro serviço.');
+  });
+
+  document.getElementById('memeForm').addEventListener('submit', e => {
     e.preventDefault();
-    const fileUrl = memeFileUrl.value;
-    const text = memeText.value;
-    if (!currentUser) { memeMessage.style.color = "red"; memeMessage.textContent = "Você precisa estar logado."; return; }
-    if (!fileUrl) { memeMessage.style.color = "red"; memeMessage.textContent = "Faça upload do meme."; return; }
-    if (users[currentUser].banned) { memeMessage.style.color = "red"; memeMessage.textContent = "Você foi banido."; return; }
-    if (contemConteudoProibido(text)) { memeMessage.style.color = "red"; memeMessage.textContent = "Conteúdo proibido detectado!"; return; }
-    memes.unshift({ id: Date.now(), user: currentUser, pic: fileUrl, text, video: fileUrl.endsWith(".mp4") || fileUrl.includes("/video/"), likes: [], comments: [] });
-    saveData();
-    memeMessage.style.color = "green";
-    memeMessage.textContent = "Meme postado!";
-    memeForm.reset();
-    showMemes();
-  };
+    clearMessages();
+    if(!currentUser) {
+      document.getElementById('memeMessage').textContent = 'Faça login para postar memes.';
+      return;
+    }
+    const url = document.getElementById('memeFileUrl').value.trim();
+    if(!url) {
+      document.getElementById('memeMessage').textContent = 'Envie um arquivo antes.';
+      return;
+    }
+    const text = document.getElementById('memeText').value.trim();
+    memes.unshift({
+      id: Date.now(),
+      user: currentUser.username || 'Anônimo',
+      userPhoto: currentUser.photo || '',
+      fileUrl: url,
+      text: text,
+      likes: 0,
+      comments: [],
+      timestamp: new Date().toISOString()
+    });
+    saveMemes();
+    document.getElementById('memeMessage').textContent = 'Meme postado!';
+    e.target.reset();
+    document.getElementById('memeFileUrl').value = '';
+    renderMemes();
+  });
 
-  function showMemes() {
-    memeList.innerHTML = "";
+  function renderMemes() {
+    const container = document.getElementById('memeList');
+    container.innerHTML = '';
     memes.forEach(meme => {
-      const div = document.createElement("div");
-      div.classList.add("meme");
-      let mediaElement = meme.video ? document.createElement("video") : document.createElement("img");
-      mediaElement.src = meme.pic;
-      if(meme.video) mediaElement.controls = true;
-      div.appendChild(mediaElement);
+      const div = document.createElement('div');
+      div.className = 'meme';
+      let mediaHTML = '';
+      const ext = meme.fileUrl.split('.').pop().toLowerCase();
+      if(['mp4','webm','ogg'].includes(ext)) {
+        mediaHTML = `<video controls src="${meme.fileUrl}"></video>`;
+      } else if(['mp3','wav','ogg'].includes(ext)) {
+        mediaHTML = `<audio controls src="${meme.fileUrl}"></audio>`;
+      } else {
+        mediaHTML = `<img src="${meme.fileUrl}" alt="Meme" />`;
+      }
+      div.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+          <img src="${meme.userPhoto}" alt="${meme.user}" style="width:44px; height:44px; border-radius:50%; object-fit:cover; box-shadow: 0 2px 8px rgb(37 99 235 / 0.3);" />
+          <strong style="font-size:18px; color:#1e40af;">${meme.user}</strong>
+        </div>
+        ${mediaHTML}
+        <p>${meme.text || ''}</p>
+        <small>${new Date(meme.timestamp).toLocaleString()}</small>
+        <div class="btn-group">
+          <button class="like-btn" title="Curtir ❤️">❤️ ${meme.likes}</button>
+          <button class="report-btn" title="Denunciar 🛑">🛑</button>
+          ${currentUser && currentUser.username === meme.user ? `<button class="delete-media-btn" title="Excluir mídia 🧼">🧼</button>` : ''}
+        </div>
+        <div class="comment-section">
+          ${meme.comments.map(c => `<p>${c.user}: ${c.text}</p>`).join('')}
+          ${currentUser ? `
+          <form data-meme-id="${meme.id}">
+            <input type="text" placeholder="Comentário..." required />
+            <button type="submit">Enviar</button>
+          </form>` : ''}
+        </div>
+      `;
+      container.appendChild(div);
 
-      const p = document.createElement("p");
-      p.textContent = meme.text || "";
-      div.appendChild(p);
-
-      const small = document.createElement("small");
-      small.textContent = `Postado por: ${meme.user}`;
-      div.appendChild(small);
-
-      const likeBtn = document.createElement("button");
-      likeBtn.className = "like-btn";
-      likeBtn.textContent = `❤️ ${meme.likes.length}`;
+      const likeBtn = div.querySelector('.like-btn');
       likeBtn.onclick = () => {
-        if (!currentUser) return alert("Você precisa estar logado.");
-        const index = meme.likes.indexOf(currentUser);
-        if (index === -1) meme.likes.push(currentUser); else meme.likes.splice(index, 1);
-        saveData(); showMemes();
+        meme.likes++;
+        saveMemes();
+        renderMemes();
       };
-      div.appendChild(likeBtn);
 
-      const reportBtn = document.createElement("button");
-      reportBtn.className = "report-btn";
-      reportBtn.textContent = "🚨 Denunciar";
+      const reportBtn = div.querySelector('.report-btn');
       reportBtn.onclick = () => {
-        if (!currentUser) return alert("Você precisa estar logado.");
-        reports.push({ memeId: meme.id, memeUser: meme.user, reporter: currentUser, text: meme.text });
-        saveData();
-        alert("Denúncia enviada!");
+        if(!currentUser || !currentUser.isAdmin) {
+          alert('Somente administradores podem denunciar.');
+          return;
+        }
+        const reason = prompt('Motivo da denúncia:');
+        if(reason) {
+          reports.push({
+            id: Date.now(),
+            memeId: meme.id,
+            reporter: currentUser.username,
+            reason,
+            meme,
+            timestamp: new Date().toISOString()
+          });
+          saveReports();
+          alert('Denúncia enviada.');
+          renderReports();
+        }
       };
-      div.appendChild(reportBtn);
 
-      const commentSection = document.createElement("div");
-      commentSection.className = "comment-section";
-      const commentForm = document.createElement("form");
-      commentForm.innerHTML = `<input type="text" placeholder="Comentar..." required /><button type="submit">Enviar</button>`;
-      commentForm.onsubmit = ev => {
-        ev.preventDefault();
-        if (!currentUser) return alert("Você precisa estar logado.");
-        const input = commentForm.querySelector("input");
-        meme.comments.push({ user: currentUser, text: input.value });
-        input.value = "";
-        saveData();
-        showMemes();
-      };
-      commentSection.appendChild(commentForm);
-      meme.comments.forEach(c => {
-        const cp = document.createElement("p");
-        cp.textContent = `${c.user}: ${c.text}`;
-        commentSection.appendChild(cp);
-      });
-      div.appendChild(commentSection);
-
-      if(users[currentUser] && users[currentUser].isAdmin){
-        const adminPanel = document.createElement("div");
-        adminPanel.classList.add("admin-panel");
-        adminPanel.innerHTML = `<button class="ban-btn">Banir Usuário</button><button class="remove-btn">Remover Meme</button>`;
-        div.appendChild(adminPanel);
-        mediaElement.style.cursor = "pointer";
-        mediaElement.onclick = () => { adminPanel.classList.toggle("show"); };
-        adminPanel.querySelector(".ban-btn").onclick = () => {
-          if(confirm(`Banir o usuário ${meme.user}?`)){
-            users[meme.user].banned = true;
-            saveData();
-            alert(`${meme.user} foi banido.`);
-            showMemes();
-          }
-        };
-        adminPanel.querySelector(".remove-btn").onclick = () => {
-          if(confirm("Remover este meme?")){
+      const deleteMediaBtn = div.querySelector('.delete-media-btn');
+      if(deleteMediaBtn) {
+        deleteMediaBtn.onclick = () => {
+          if(confirm('Excluir esta mídia?')) {
             memes = memes.filter(m => m.id !== meme.id);
-            saveData();
-            showMemes();
+            saveMemes();
+            renderMemes();
           }
         };
       }
-      memeList.appendChild(div);
+
+      const commentForm = div.querySelector('.comment-section form');
+      if(commentForm) {
+        commentForm.onsubmit = e => {
+          e.preventDefault();
+          const input = e.target.querySelector('input');
+          const text = input.value.trim();
+          if(text) {
+            meme.comments.push({ user: currentUser.username, text });
+            saveMemes();
+            renderMemes();
+          }
+        };
+      }
     });
   }
 
-  function showReports() {
-    reportList.innerHTML = "";
-    if(!users[currentUser] || !users[currentUser].isAdmin){
-      reportList.innerHTML = "<p>Somente administradores podem ver as denúncias.</p>";
+  function renderReports() {
+    const container = document.getElementById('reportList');
+    container.innerHTML = '';
+    if(!currentUser || !currentUser.isAdmin) {
+      container.innerHTML = '<p>Somente administradores podem ver as denúncias.</p>';
       return;
     }
-    if(reports.length === 0){
-      reportList.innerHTML = "<p>Sem denúncias no momento.</p>";
+    if(reports.length === 0) {
+      container.innerHTML = '<p>Não há denúncias.</p>';
       return;
     }
-    reports.forEach((r, i) => {
-      const div = document.createElement("div");
-      div.className = "meme";
-      div.innerHTML = `<p><b>Denunciado:</b> ${r.memeUser}</p><p><b>Por:</b> ${r.reporter}</p><p><b>Texto:</b> ${r.text || "(sem texto)"}</p>`;
-      const removeReport = document.createElement("button");
-      removeReport.textContent = "Excluir denúncia";
-      removeReport.onclick = () => {
-        reports.splice(i,1);
-        saveData();
-        showReports();
+    reports.forEach(report => {
+      const div = document.createElement('div');
+      div.style = 'background:#fef2f2; border:1px solid #fecaca; padding:16px; margin-bottom:16px; border-radius:12px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15); color:#991b1b;';
+      div.innerHTML = `
+        <strong>Denunciado por:</strong> ${report.reporter}<br/>
+        <strong>Motivo:</strong> ${report.reason}<br/>
+        <strong>Data:</strong> ${new Date(report.timestamp).toLocaleString()}<br/>
+        <strong>Meme:</strong><br/>
+        <div style="margin:12px 0;">
+          ${report.meme.fileUrl.match(/\.(mp4|webm|ogg)$/i) ? `<video controls src="${report.meme.fileUrl}" style="max-width:100%; border-radius:12px;"></video>` :
+          report.meme.fileUrl.match(/\.(mp3|wav|ogg)$/i) ? `<audio controls src="${report.meme.fileUrl}" style="width:100%; border-radius:12px;"></audio>` :
+          `<img src="${report.meme.fileUrl}" alt="Meme denunciado" style="max-width:100%; border-radius:12px;" />`}
+          <p style="font-weight:600; margin-top:10px; color:#b91c1c;">${report.meme.text || ''}</p>
+        </div>
+        <button class="delete-report-btn">Excluir Denúncia</button>
+      `;
+      container.appendChild(div);
+
+      const btn = div.querySelector('button.delete-report-btn');
+      btn.onclick = () => {
+        if(confirm('Excluir esta denúncia?')) {
+          reports = reports.filter(r => r.id !== report.id);
+          saveReports();
+          renderReports();
+        }
       };
-      div.appendChild(removeReport);
-      reportList.appendChild(div);
     });
   }
 
-  updateUserPic();
-  showMemes();
+  updateHeader();
+  renderMemes();
 </script>
 
 </body>
