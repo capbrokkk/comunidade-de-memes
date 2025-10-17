@@ -23,11 +23,24 @@
       text-align: center;
       color: white;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
     }
     header h1 {
       margin: 0;
       font-weight: 600;
       font-size: 28px;
+    }
+    #userPic {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid white;
+      display: none;
+      cursor: pointer;
     }
     nav {
       display: flex;
@@ -112,22 +125,6 @@
       color: #e74c3c;
       min-height: 20px;
     }
-    #playMusic {
-      display: block;
-      margin: 20px auto 40px;
-      padding: 12px 25px;
-      background: #4a90e2;
-      color: white;
-      border: none;
-      border-radius: 30px;
-      font-size: 16px;
-      cursor: pointer;
-      box-shadow: 0 3px 8px rgba(74,144,226,0.5);
-      transition: background 0.3s ease;
-    }
-    #playMusic:hover {
-      background: #357ABD;
-    }
     .meme {
       background: white;
       padding: 15px 20px;
@@ -192,24 +189,24 @@
         padding: 20px;
       }
     }
-section#rules {
-  max-width: 700px;
-  margin: auto;
-  background: #fff;
-  padding: 25px 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(74,144,226,0.15);
-  font-size: 18px;
-  line-height: 1.6;
-  color: #444;
-}
-
+    section#rules {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 25px 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(74,144,226,0.15);
+      font-size: 18px;
+      line-height: 1.6;
+      color: #444;
+    }
   </style>
 </head>
 <body>
 
 <header>
   <h1>Comunidade de Memes</h1>
+  <img id="userPic" alt="Foto do usuário" />
 </header>
 
 <nav>
@@ -218,15 +215,10 @@ section#rules {
   <button class="tab-btn" data-tab="signup">Criar Conta</button>
   <button class="tab-btn" data-tab="add">Adicionar Meme</button>
   <button class="tab-btn" data-tab="memes">Ver Memes</button>
-<button class="tab-btn" data-tab="rules">Regras</button>
+  <button class="tab-btn" data-tab="rules">Regras</button>
 </nav>
 
 <main>
-  <button id="playMusic">Ativar música de fundo</button>
-  <audio id="bgMusic" loop>
-    <source src="renom.mp3" type="audio/mp3" />
-  </audio>
-
   <section id="home" class="active">
     <h2>Bem-vindo!</h2>
     <p>Entre, crie conta e compartilhe memes!</p>
@@ -254,7 +246,7 @@ section#rules {
 
   <section id="add">
     <form id="memeForm">
-      <input type="file" id="memeFile" accept="image/*,video/*" required />
+      <input type="file" id="memeFile" accept="image/*,video/mp4,video/webm,video/ogg" required />
       <textarea id="memeText" placeholder="Texto do meme (opcional)"></textarea>
       <input type="submit" value="Postar Meme" />
       <div class="message" id="memeMessage"></div>
@@ -265,15 +257,14 @@ section#rules {
     <div id="memeList"></div>
   </section>
 
-<section id="rules">
-  <h2>Regras da Comunidade</h2>
-  <ul>
-    <li>Proibido pornografia.</li>
-    <li>Proibido meme com pornografia.</li>
-    <li>Proibido meme com partes sexuais mostrando.</li>
-  </ul>
-</section>
-
+  <section id="rules">
+    <h2>Regras da Comunidade</h2>
+    <ul>
+      <li>Proibido pornografia.</li>
+      <li>Proibido meme com pornografia.</li>
+      <li>Proibido meme com partes sexuais mostrando.</li>
+    </ul>
+  </section>
 </main>
 
 <footer>
@@ -281,213 +272,287 @@ section#rules {
 </footer>
 
 <script>
-let currentUser = null;
-let users = JSON.parse(localStorage.getItem("users")) || {};
-let memes = JSON.parse(localStorage.getItem("memes")) || [];
+  let currentUser = null;
+  let users = JSON.parse(localStorage.getItem("users")) || {};
+  let memes = JSON.parse(localStorage.getItem("memes")) || [];
 
-function saveData() {
-  localStorage.setItem("users", JSON.stringify(users));
-  localStorage.setItem("memes", JSON.stringify(memes));
-}
-
-document.querySelectorAll(".tab-btn").forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
-    document.getElementById(btn.dataset.tab).classList.add("active");
-    clearMessages();
-  };
-});
-
-function clearMessages() {
-  ["loginMessage","signupMessage","memeMessage"].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.textContent = "";
-  });
-}
-
-const playBtn = document.getElementById("playMusic");
-const bgMusic = document.getElementById("bgMusic");
-
-playBtn.onclick = () => {
-  if (bgMusic.paused) {
-    bgMusic.volume = 0.1;
-    bgMusic.play().catch(() => alert("Interaja com a página para ativar o áudio."));
-    playBtn.textContent = "Pausar música";
-  } else {
-    bgMusic.pause();
-    playBtn.textContent = "Ativar música de fundo";
-  }
-};
-
-document.getElementById("signupForm").onsubmit = e => {
-  e.preventDefault();
-  const user = document.getElementById("signupUser").value.trim();
-  const pass = document.getElementById("signupPass").value;
-  const pic = document.getElementById("signupPic").files[0];
-  const msg = document.getElementById("signupMessage");
-
-  if (!user || !pass || !pic) {
-    msg.textContent = "Preencha todos os campos.";
-    return;
+  function saveData() {
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem("memes", JSON.stringify(memes));
   }
 
-  if (users[user]) {
-    msg.textContent = "Usuário já existe.";
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    users[user] = {
-      pass,
-      pic: reader.result,
-      friends: [],
-      followers: [],
-      isAdmin: user === "capkzy",
-      banned: false
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById(btn.dataset.tab).classList.add("active");
+      clearMessages();
     };
-    saveData();
-    msg.style.color = "green";
-    msg.textContent = "Conta criada!";
-    document.getElementById("signupForm").reset();
-  };
-  reader.readAsDataURL(pic);
-};
+  });
 
-document.getElementById("loginForm").onsubmit = e => {
-  e.preventDefault();
-  const user = document.getElementById("loginUser").value.trim();
-  const pass = document.getElementById("loginPass").value;
-  const secret = document.getElementById("loginSecret").value;
-  const msg = document.getElementById("loginMessage");
-
-  if (!users[user]) {
-    msg.style.color = "red";
-    msg.textContent = "Usuário não encontrado.";
-    return;
-  }
-
-  if (users[user].banned) {
-    msg.style.color = "red";
-    msg.textContent = "Você foi banido.";
-    return;
-  }
-
-  if (users[user].pass !== pass) {
-    msg.style.color = "red";
-    msg.textContent = "Senha incorreta.";
-    return;
-  }
-
-  if (secret && secret === "3x!AdmC0d3#2025") {
-    users[user].isAdmin = true;
-    saveData();
-  }
-
-  currentUser = user;
-  msg.style.color = "green";
-  msg.textContent = "Logado como " + user;
-  document.getElementById("loginForm").reset();
-};
-
-document.getElementById("memeForm").onsubmit = e => {
-  e.preventDefault();
-  const file = document.getElementById("memeFile").files[0];
-  const text = document.getElementById("memeText").value;
-  const msg = document.getElementById("memeMessage");
-
-  if (!currentUser) {
-    msg.style.color = "red";
-    msg.textContent = "Você precisa estar logado.";
-    return;
-  }
-  if (!file) {
-    msg.style.color = "red";
-    msg.textContent = "Escolha um arquivo.";
-    return;
-  }
-  if (users[currentUser].banned) {
-    msg.style.color = "red";
-    msg.textContent = "Você foi banido.";
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    memes.unshift({
-      id: Date.now(),
-      user: currentUser,
-      pic: reader.result,
-      text,
-      video: file.type.startsWith("video/")
+  function clearMessages() {
+    ["loginMessage","signupMessage","memeMessage"].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.textContent = "";
     });
-    saveData();
-    msg.style.color = "green";
-    msg.textContent = "Meme postado!";
-    document.getElementById("memeForm").reset();
-    showMemes();
-  };
-  reader.readAsDataURL(file);
-};
+  }
 
-function showMemes() {
+  function updateUserPic() {
+    const img = document.getElementById("userPic");
+    if(currentUser && users[currentUser] && users[currentUser].pic){
+      img.src = users[currentUser].pic;
+      img.style.display = "block";
+      img.title = currentUser;
+    } else {
+      img.style.display = "none";
+    }
+  }
+
+  document.getElementById("signupForm").onsubmit = e => {
+    e.preventDefault();
+    const user = document.getElementById("signupUser").value.trim();
+    const pass = document.getElementById("signupPass").value;
+    const pic = document.getElementById("signupPic").files[0];
+    const msg = document.getElementById("signupMessage");
+
+    if (!user || !pass || !pic) {
+      msg.textContent = "Preencha todos os campos.";
+      msg.style.color = "red";
+      return;
+    }
+
+    if (users[user]) {
+      msg.textContent = "Usuário já existe.";
+      msg.style.color = "red";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      users[user] = {
+        pass,
+        pic: reader.result,
+        friends: [],
+        followers: [],
+        isAdmin: user === "capkzy",
+        banned: false
+      };
+      saveData();
+      msg.style.color = "green";
+      msg.textContent = "Conta criada!";
+      document.getElementById("signupForm").reset();
+    };
+    reader.readAsDataURL(pic);
+  };
+
+  document.getElementById("loginForm").onsubmit = e => {
+    e.preventDefault();
+    const user = document.getElementById("loginUser").value.trim();
+    const pass = document.getElementById("loginPass").value;
+    const secret = document.getElementById("loginSecret").value;
+    const msg = document.getElementById("loginMessage");
+
+    if (!users[user]) {
+      msg.style.color = "red";
+      msg.textContent = "Usuário não encontrado.";
+      return;
+    }
+
+    if (users[user].banned) {
+      msg.style.color = "red";
+      msg.textContent = "Você foi banido.";
+      return;
+    }
+
+    if (users[user].pass !== pass) {
+      msg.style.color = "red";
+      msg.textContent = "Senha incorreta.";
+      return;
+    }
+
+    if (secret && secret === "3x!AdmC0d3#2025") {
+      users[user].isAdmin = true;
+      saveData();
+    }
+
+    currentUser = user;
+    updateUserPic();
+    msg.style.color = "green";
+    msg.textContent = "Logado como " + user;
+    document.getElementById("loginForm").reset();
+  };
+
+  document.getElementById("memeForm").onsubmit = e => {
+    e.preventDefault();
+    const file = document.getElementById("memeFile").files[0];
+    const text = document.getElementById("memeText").value;
+    const msg = document.getElementById("memeMessage");
+
+    if (!currentUser) {
+      msg.style.color = "red";
+      msg.textContent = "Você precisa estar logado.";
+      return;
+    }
+    if (!file) {
+      msg.style.color = "red";
+      msg.textContent = "Escolha um arquivo.";
+      return;
+    }
+    if (users[currentUser].banned) {
+      msg.style.color = "red";
+      msg.textContent = "Você foi banido.";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      memes.unshift({
+        id: Date.now(),
+        user: currentUser,
+        pic: reader.result,
+        text,
+        video: file.type.startsWith("video/")
+      });
+      saveData();
+      msg.style.color = "green";
+      msg.textContent = "Meme postado!";
+      document.getElementById("memeForm").reset();
+      showMemes();
+    };
+    reader.readAsDataURL(file);
+  };
+
+  function showMemes() {
+    const container = document.getElementById("memeList");
+    container.innerHTML = "";
+    memes.forEach(meme => {
+      const div = document.createElement("div");
+      div.classList.add("meme");
+
+      let mediaHTML = "";
+      if(meme.video){
+        mediaHTML = `<video controls src="${meme.pic}"></video>`;
+      } else {
+        mediaHTML = `<img src="${meme.pic}" alt="Meme" />`;
+      }
+
+      div.innerHTML = `
+        ${mediaHTML}
+        <p>${meme.text || ""}</p>
+        <small>Postado por: ${meme.user}</small>
+      `;
+
+      if(users[currentUser] && users[currentUser].isAdmin){
+        const adminPanel = document.createElement("div");
+        adminPanel.classList.add("admin-panel");
+        adminPanel.innerHTML = `
+          <button class="ban-btn">Banir Usuário</button>
+          <button class="remove-btn">Remover Meme</button>
+        `;
+        div.appendChild(adminPanel);
+
+        div.querySelector("img, video").onclick = () => {
+          adminPanel.classList.toggle("show");
+        };
+
+        adminPanel.querySelector(".ban-btn").onclick = () => {
+          if(confirm(`Banir o usuário ${meme.user}?`)){
+            users[meme.user].banned = true;
+            saveData();
+            alert(`${meme.user} foi banido.`);
+            showMemes();
+          }
+        };
+
+        adminPanel.querySelector(".remove-btn").onclick = () => {
+          if(confirm("Remover este meme?")){
+            memes = memes.filter(m => m.id !== meme.id);
+            saveData();
+            showMemes();
+          }
+        };
+      }
+
+      container.appendChild(div);
+    });
+  }
+
+ function showMemes() {
   const container = document.getElementById("memeList");
   container.innerHTML = "";
   memes.forEach(meme => {
     const div = document.createElement("div");
     div.classList.add("meme");
+
+    let mediaElement;
+
     if(meme.video){
-      div.innerHTML = `
-        <video controls src="${meme.pic}"></video>
-        <p>${meme.text || ""}</p>
-        <small>Postado por: ${meme.user}</small>
-      `;
+      mediaElement = document.createElement("video");
+      mediaElement.src = meme.pic;
+      mediaElement.controls = true;
+      mediaElement.preload = "metadata";
+      mediaElement.style.maxWidth = "100%";
+      mediaElement.style.borderRadius = "10px";
+      mediaElement.onerror = () => {
+        mediaElement.insertAdjacentHTML('afterend', '<p style="color:red;">Erro ao carregar vídeo.</p>');
+      }
     } else {
-      div.innerHTML = `
-        <img src="${meme.pic}" alt="Meme" />
-        <p>${meme.text || ""}</p>
-        <small>Postado por: ${meme.user}</small>
-      `;
+      mediaElement = document.createElement("img");
+      mediaElement.src = meme.pic;
+      mediaElement.alt = "Meme";
+      mediaElement.style.maxWidth = "100%";
+      mediaElement.style.borderRadius = "10px";
     }
+
+    div.appendChild(mediaElement);
+
+    const p = document.createElement("p");
+    p.textContent = meme.text || "";
+    div.appendChild(p);
+
+    const small = document.createElement("small");
+    small.textContent = `Postado por: ${meme.user}`;
+    div.appendChild(small);
+
     if(users[currentUser] && users[currentUser].isAdmin){
       const adminPanel = document.createElement("div");
       adminPanel.classList.add("admin-panel");
       adminPanel.innerHTML = `
-        <button onclick="banUser('${meme.user}')">Banir Usuário</button>
-        <button onclick="removeMeme(${meme.id})">Remover Meme</button>
+        <button class="ban-btn">Banir Usuário</button>
+        <button class="remove-btn">Remover Meme</button>
       `;
       div.appendChild(adminPanel);
 
-      div.querySelector("img, video").onclick = () => {
+      mediaElement.style.cursor = "pointer";
+      mediaElement.onclick = () => {
         adminPanel.classList.toggle("show");
       };
+
+      adminPanel.querySelector(".ban-btn").onclick = () => {
+        if(confirm(`Banir o usuário ${meme.user}?`)){
+          users[meme.user].banned = true;
+          saveData();
+          alert(`${meme.user} foi banido.`);
+          showMemes();
+        }
+      };
+
+      adminPanel.querySelector(".remove-btn").onclick = () => {
+        if(confirm("Remover este meme?")){
+          memes = memes.filter(m => m.id !== meme.id);
+          saveData();
+          showMemes();
+        }
+      };
     }
+
     container.appendChild(div);
   });
 }
 
-function banUser(user){
-  if(user === currentUser){
-    alert("Você não pode banir você mesmo.");
-    return;
-  }
-  if(users[user]){
-    users[user].banned = true;
-    saveData();
-    alert(`Usuário ${user} banido.`);
-    showMemes();
-  }
-}
+  updateUserPic();
 
-function removeMeme(id){
-  memes = memes.filter(m => m.id !== id);
-  saveData();
-  showMemes();
-}
-
-showMemes();
 </script>
 
 </body>
