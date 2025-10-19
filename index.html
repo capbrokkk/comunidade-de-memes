@@ -19,6 +19,52 @@
 }
 *{box-sizing:border-box}
 html,body{height:100%}
+<h2>Mensagens da comunidade</h2>
+<ul id="messages-list" style="list-style:none; padding:0;"></ul>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabaseUrl = 'https://eltxzarekmprfyhnjwrn.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsdHh6YXJla21wcmZ5aG5qd3JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4ODcyNzcsImV4cCI6MjA3NjQ2MzI3N30.mfG2Icv91YM3WE34bsaNENpTbTtCUGmPpyChZ7OIqcc';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+  const ul = document.getElementById('messages-list');
+
+  function addMessage(msg) {
+    const li = document.createElement('li');
+    li.textContent = msg.content ?? '[sem conteúdo]';
+    li.style.background = '#eee';
+    li.style.margin = '5px 0';
+    li.style.padding = '8px';
+    li.style.borderRadius = '6px';
+    ul.appendChild(li);
+  }
+
+  async function loadMessages() {
+    const { data, error } = await supabase
+      .from('mensagens')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (error) {
+      console.error(error);
+      return;
+    }
+    ul.innerHTML = '';
+    data.forEach(addMessage);
+  }
+
+  function subscribeToNewMessages() {
+    supabase
+      .channel('public:mensagens')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mensagens' }, payload => {
+        addMessage(payload.new);
+      })
+      .subscribe();
+  }
+
+  loadMessages();
+  subscribeToNewMessages();
+</script>
 body{
   margin:0;
   font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
