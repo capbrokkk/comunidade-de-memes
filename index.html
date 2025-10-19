@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Comunidade de Memes</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#2563eb;
+  --blue-700:#1e40af;
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --danger:#ef4444;
+  --success:#16a34a;
+  --glass: rgba(255,255,255,0.6);
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+<h2>Mensagens da comunidade</h2>
+<ul id="messages-list" style="list-style:none; padding:0;"></ul>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabaseUrl = 'https://eltxzarekmprfyhnjwrn.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsdHh6YXJla21wcmZ5aG5qd3JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4ODcyNzcsImV4cCI6MjA3NjQ2MzI3N30.mfG2Icv91YM3WE34bsaNENpTbTtCUGmPpyChZ7OIqcc';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+  const ul = document.getElementById('messages-list');
+
+  function addMessage(msg) {
+    const li = document.createElement('li');
+    li.textContent = msg.content ?? '[sem conteúdo]';
+    li.style.background = '#eee';
+    li.style.margin = '5px 0';
+    li.style.padding = '8px';
+    li.style.borderRadius = '6px';
+    ul.appendChild(li);
+  }
+
+  async function loadMessages() {
+    const { data, error } = await supabase
+      .from('mensagens')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (error) {
+      console.error(error);
+      return;
+    }
+    ul.innerHTML = '';
+    data.forEach(addMessage);
+  }
+
+  function subscribeToNewMessages() {
+    supabase
+      .channel('public:mensagens')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mensagens' }, payload => {
+        addMessage(payload.new);
+      })
+      .subscribe();
+  }
+
+  loadMessages();
+  subscribeToNewMessages();
+</script>
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+  background:linear-gradient(180deg,#f3f6ff 0%, #f8fafc 60%);
+  color:#0f172a;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:22px;
+  padding:28px;
+}
+
+/* header */
+.header{
+  width:100%;
+  max-width:1180px;
+  background:var(--blue);
+  color:#fff;
+  border-radius:12px;
+  padding:18px 24px;
+  box-shadow:0 8px 30px rgba(37,99,235,0.12);
+  display:flex;
+  align-items:center;
+  gap:18px;
+  position:relative;
+}
+.brand{
+  display:flex;
+  gap:14px;
+  align-items:center;
+}
+.logo{
+  width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#fff3,rgba(255,255,255,0.07));
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:white;font-size:20px;box-shadow:0 6px 18px rgba(0,0,0,0.08);
+}
+.title{font-size:22px;font-weight:800;letter-spacing:0.6px}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.avatar{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.18);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+.logout-btn{background:var(--danger);color:white;border:none;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(239,68,68,0.15)}
+.logout-btn:hover{background:#dc2626}
+
+/* layout */
+.container{
+  width:100%;
+  max-width:1180px;
+  display:grid;
+  grid-template-columns:300px 1fr 340px;
+  gap:22px;
+  align-items:start;
+}
+
+/* sidebar */
+.sidebar{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:0 8px 24px rgba(15,23,42,0.06);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  position:sticky;top:34px;
+  height:fit-content;
+}
+.user-small{display:flex;gap:12px;align-items:center}
+.user-small img{width:56px;height:56px;border-radius:12px;object-fit:cover}
+.user-small .info{display:flex;flex-direction:column}
+.user-small .info .name{font-weight:700}
+.user-small .info .meta{color:var(--muted);font-size:13px}
+.nav{
+  display:flex;flex-direction:column;gap:6px;margin-top:6px;
+}
+.nav button{
+  background:transparent;border:none;padding:10px 12px;border-radius:10px;text-align:left;color:var(--blue);font-weight:700;cursor:pointer;
+}
+.nav button.active{background:linear-gradient(90deg,var(--blue)10%,rgba(37,99,235,0.06));color:var(--blue-700)}
+.small-note{font-size:13px;color:var(--muted);padding-top:6px;border-top:1px dashed #eef2ff}
+
+/* main */
+.main{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.welcome{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:0 8px 24px rgba(15,23,42,0.06);
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+.welcome .left{flex:1}
+.welcome h1{margin:0;font-size:20px}
+.welcome p{color:var(--muted);margin-top:8px}
+.welcome .cta{display:flex;gap:10px;margin-top:12px}
+.btn{
+  background:var(--blue);color:white;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700;box-shadow:0 8px 18px rgba(37,99,235,0.12)
+}
+.btn.ghost{background:transparent;color:var(--blue);border:1px solid rgba(37,99,235,0.08)}
+
+/* feed */
+.controls{
+  display:flex;gap:12px;align-items:center;justify-content:space-between;
+}
+.search{flex:1;display:flex;gap:8px}
+.search input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e6eefc;font-size:15px}
+.filters{display:flex;gap:8px}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:18px;
+}
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 12px 30px rgba(15,23,42,0.05);
+  display:flex;flex-direction:column;
+  gap:10px;
+}
+.media{border-radius:12px;overflow:hidden;background:#000}
+.media img, .media video, .media audio{width:100%;display:block}
+.meta{display:flex;align-items:center;gap:12px}
+.meta img{width:44px;height:44px;border-radius:10px;object-fit:cover}
+.meta .who{font-weight:700}
+.meta .when{color:var(--muted);font-size:13px}
+.actions{display:flex;gap:8px;align-items:center}
+.icon-btn{background:transparent;border:1px solid #eef2ff;padding:8px 10px;border-radius:10px;cursor:pointer;color:var(--muted);font-weight:700}
+.icon-btn.like{color:#ef4444;border-color:#ffebe7}
+.count{font-weight:800;color:var(--muted)}
+
+/* right pane */
+.right{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:0 8px 24px rgba(15,23,42,0.06);
+  position:sticky;top:34px;
+  height:fit-content;
+}
+.section-title{font-weight:800;margin-bottom:12px}
+.small{font-size:14px;color:var(--muted);margin-bottom:10px}
+
+/* forms */
+.form-row{display:flex;gap:10px}
+.input{width:100%;padding:10px;border-radius:10px;border:1px solid #e6eefc}
+.file-drop{border:2px dashed #e6eefc;padding:18px;border-radius:12px;display:flex;align-items:center;gap:12px;justify-content:center;color:var(--muted)}
+
+/* reports modal */
+.modal{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(7,12,20,0.45);
+  z-index:200;
+}
+.modal-card{background:var(--card);border-radius:12px;padding:20px;max-width:720px;width:100%;box-shadow:0 18px 50px rgba(2,6,23,0.4)}
+.modal-row{display:flex;gap:12px;align-items:center;margin-top:12px}
+.input-sm{padding:10px;border-radius:10px;border:1px solid #e6eefc;width:100%}
+
+/* footer */
+.footer{width:100%;max-width:1180px;padding:12px 18px;border-radius:10px;background:#fff;border:1px solid #eef2ff;color:var(--muted);display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.badge{background:#eef2ff;color:var(--blue);padding:6px 10px;border-radius:8px;font-weight:700}
+.hidden{display:none}
+@media (max-width:1100px){
+  .container{grid-template-columns:1fr;max-width:980px}
+  .header{padding:14px}
+  .header-right{display:none}
+  .right{order:3}
+  .sidebar{order:2}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="brand">
+    <div class="logo">CM</div>
+    <div>
+      <div class="title">Comunidade de Memes</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.9)">Compartilhe risos, siga criadores, modere com responsabilidade</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <img id="topAvatar" class="avatar" src="https://i.pravatar.cc/44?u=guest" alt="avatar">
+    <button id="logout" class="logout-btn">Sair</button>
+  </div>
+</header>
+
+<div class="container" id="app">
+
+  <aside class="sidebar">
+    <div class="user-small" id="sidebarUser">
+      <img id="sidebarAvatar" src="https://i.pravatar.cc/100?u=guest" alt="">
+      <div class="info">
+        <div class="name" id="sidebarName">Convidado</div>
+        <div class="meta" id="sidebarMeta">Bem-vindo(a)!</div>
+      </div>
+    </div>
+
+    <div class="nav" id="mainNav">
+      <button class="active" data-view="feed">Feed</button>
+      <button data-view="create">Postar Meme</button>
+      <button data-view="my">Meus Memes</button>
+      <button data-view="denuncias">Denúncias</button>
+      <button data-view="regras">Regras</button>
+      <button data-view="sobre">Sobre</button>
+      <button data-view="explore">Explorar</button>
+      <button data-view="perfil">Perfil</button>
+    </div>
+
+    <div class="small-note">
+      <div style="font-weight:700;margin-bottom:8px">Direitos</div>
+      <div style="font-size:13px;color:var(--muted)">© 2025 Comunidade de Memes — Todos os direitos reservados</div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <section id="feedView" class="view active">
+      <div class="welcome">
+        <div class="left">
+          <h1 id="welcomeTitle">Bem-vindo(a) à Comunidade de Memes</h1>
+          <p id="welcomeSub">Poste, curta, comente e denuncie conteúdo que viole as regras. Siga criadores e compartilhe risos.</p>
+          <div class="cta">
+            <button class="btn" id="openCreate">Postar Meme</button>
+            <button class="btn ghost" id="openRules">Ver Regras</button>
+          </div>
+        </div>
+        <div style="width:220px">
+          <div style="background:linear-gradient(180deg,#ffffff08,#ffffff00);padding:12px;border-radius:12px">
+            <div style="font-size:13px;color:var(--muted)">Membros</div>
+            <div style="font-weight:800;font-size:18px;margin-top:8px" id="totalUsers">—</div>
+            <div style="font-size:12px;color:var(--muted)">ativos nas últimas 24h</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="search">
+          <input id="searchInput" placeholder="Pesquisar memes, usuários, tags..." />
+        </div>
+        <div class="filters">
+          <select id="filterType" class="input">
+            <option value="all">Todos</option>
+            <option value="image">Imagens</option>
+            <option value="video">Vídeos</option>
+            <option value="audio">Áudios</option>
+          </select>
+          <button class="btn ghost" id="refreshFeed">Atualizar</button>
+        </div>
+      </div>
+
+      <div id="feedGrid" class="grid" style="margin-top:10px"></div>
+    </section>
+
+    <section id="createView" class="view hidden">
+      <div class="upload-form">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:800;font-size:18px">Criar Novo Meme</div>
+          <div style="color:var(--muted);font-size:13px">Formato: imagem, vídeo ou áudio</div>
+        </div>
+        <div style="height:12px"></div>
+        <div id="fileDrop" class="file-drop">Arraste e solte ou clique para escolher (PNG, JPG, MP4, WEBM, MP3)</div>
+        <input id="fileInput" class="hidden" type="file" accept="image/*,video/*,audio/*" />
+        <input id="titleInput" class="input" placeholder="Título (opcional)" />
+        <textarea id="descInput" class="input" placeholder="Descrição do meme (opcional)" style="height:120px"></textarea>
+        <div style="display:flex;gap:10px;align-items:center">
+          <input id="nsfwCheck" type="checkbox" /> <label for="nsfwCheck" style="color:var(--muted);font-size:14px">Marcar como sensível (NSFW)</label>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:12px">
+          <button class="btn" id="postBtn">Postar</button>
+          <button class="btn ghost" id="clearForm">Limpar</button>
+          <div id="uploadStatus" style="margin-left:auto;color:var(--muted)"></div>
+        </div>
+      </div>
+
+      <div class="small" style="margin-top:8px">Ao postar você concorda com as <a href="#" id="linkRules">regras da comunidade</a>.</div>
+    </section>
+
+    <section id="myView" class="view hidden">
+      <div style="font-weight:800;font-size:18px;margin-bottom:12px">Seus Memes</div>
+      <div id="myMemesGrid" class="grid"></div>
+    </section>
+
+    <section id="denunciasView" class="view hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-weight:800;font-size:18px">Denúncias</div>
+        <div style="color:var(--muted)">Apenas administradores podem agir sobre denúncias</div>
+      </div>
+      <div id="reportsList" style="margin-top:12px;display:flex;flex-direction:column;gap:12px"></div>
+    </section>
+
+    <section id="regrasView" class="view hidden">
+      <div style="font-weight:800;font-size:18px">Regras da Comunidade</div>
+      <ul style="margin-top:12px;color:var(--muted);line-height:1.6">
+        <li>Proibido pornografia explícita.</li>
+        <li>Proibido conteúdo racista ou que incentive ódio.</li>
+        <li>Respeite privacidade e não divulgue dados sensíveis.</li>
+        <li>Denuncie conteúdo que viole as regras.</li>
+      </ul>
+    </section>
+
+    <section id="sobreView" class="view hidden">
+      <div style="font-weight:800;font-size:18px">Sobre a Comunidade</div>
+      <p style="color:var(--muted);margin-top:10px">Plataforma comunitária para compartilhar memes. Moderadores e administradores atuam para manter um ambiente saudável.</p>
+    </section>
+
+    <section id="perfilView" class="view hidden">
+      <div style="display:flex;gap:18px;align-items:center">
+        <img id="profilePicLarge" src="https://i.pravatar.cc/140?u=guest" style="width:120px;height:120px;border-radius:16px;object-fit:cover">
+        <div>
+          <div style="font-weight:800;font-size:20px" id="profileName">Convidado</div>
+          <div style="color:var(--muted);margin-top:6px" id="profileBio">Sem biografia.</div>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button class="btn" id="followBtn">Seguir</button>
+            <button class="btn ghost" id="messageBtn">Mensagem</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <aside class="right">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="section-title">Criadores em Alta</div>
+      <div class="badge">Top</div>
+    </div>
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:10px;align-items:center">
+        <img src="https://i.pravatar.cc/44?u=1" style="width:44px;height:44px;border-radius:10px;object-fit:cover">
+        <div>
+          <div style="font-weight:700">capkzy</div>
+          <div style="color:var(--muted);font-size:13px">1.2k seguidores</div>
+        </div>
+        <button class="btn ghost" style="margin-left:auto">Seguir</button>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center">
+        <img src="https://i.pravatar.cc/44?u=2" style="width:44px;height:44px;border-radius:10px;object-fit:cover">
+        <div>
+          <div style="font-weight:700">maria</div>
+          <div style="color:var(--muted);font-size:13px">520 seguidores</div>
+        </div>
+        <button class="btn ghost" style="margin-left:auto">Seguir</button>
+      </div>
+
+    </div>
+
+    <div style="margin-top:18px" class="section-title">Denúncias pendentes</div>
+    <div id="rightReports" style="margin-top:8px;color:var(--muted);font-size:14px">—</div>
+
+    <div style="margin-top:18px" class="section-title">Sobre</div>
+    <div class="small">© 2025 Comunidade de Memes. Desenvolvido por capkzy.</div>
+  </aside>
+
+</div>
+
+<div class="footer">
+  <div>© 2025 Comunidade de Memes</div>
+  <div style="display:flex;gap:12px;align-items:center">
+    <div style="color:var(--muted)">Feito com ❤️</div>
+  </div>
+</div>
+
+<div id="modalReport" class="modal hidden" aria-hidden="true">
+  <div class="modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:800">Gerenciar Denúncia</div>
+      <button id="closeModal" style="background:#fff;border-radius:8px;padding:6px 8px;border:1px solid #e6eefc">Fechar</button>
+    </div>
+    <div id="modalContent" style="margin-top:12px"></div>
+    <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+      <input id="adminMessage" class="input-sm" placeholder="Mensagem que será enviada ao autor (opcional)"/>
+      <input id="adminReason" class="input-sm" placeholder="Motivo da ação (ex: violação de regras)" />
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end">
+      <button id="banUserBtn" class="btn ghost">Banir Usuário</button>
+      <button id="deleteMemeBtn" class="btn" style="background:#ef4444">Excluir Meme</button>
+      <button id="removeReportBtn" class="btn ghost" style="background:#fff;border:1px solid #e6eefc">Remover Denúncia</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CLOUD_NAME = 'djeqaxjf1';
+const UPLOAD_PRESET = 'sfnas6dp';
+const ADMIN_SECRET = 'admin123';
+
+let state = {
+  users: JSON.parse(localStorage.getItem('cm_users')|| '{}'),
+  currentUser: JSON.parse(localStorage.getItem('cm_current')|| 'null'),
+  memes: JSON.parse(localStorage.getItem('cm_memes')|| '[]'),
+  reports: JSON.parse(localStorage.getItem('cm_reports')|| '[]'),
+  followers: JSON.parse(localStorage.getItem('cm_followers')|| '{}')
+};
+
+if(!state.users['admin']) {
+  state.users['admin'] = { username:'admin', password:'admin', photo:'https://i.pravatar.cc/150?img=10', isAdmin:true, bio:'Administrador' };
+  localStorage.setItem('cm_users', JSON.stringify(state.users));
+}
+
+function save() {
+  localStorage.setItem('cm_users', JSON.stringify(state.users));
+  localStorage.setItem('cm_memes', JSON.stringify(state.memes));
+  localStorage.setItem('cm_reports', JSON.stringify(state.reports));
+  localStorage.setItem('cm_current', JSON.stringify(state.currentUser));
+  localStorage.setItem('cm_followers', JSON.stringify(state.followers));
+  renderAll();
+}
+
+function uid(){return 'id_'+Math.random().toString(36).slice(2,10)}
+
+function showView(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+  document.getElementById(view+'View').classList.remove('hidden');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  const navButton=[...document.querySelectorAll('.nav button')].find(n=>n.dataset.view===view);
+  if(navButton) navButton.classList.add('active');
+}
+
+document.querySelectorAll('.nav button').forEach(b=>{
+  b.addEventListener('click',()=>showView(b.dataset.view));
+});
+
+document.getElementById('openCreate').addEventListener('click',()=>showView('create'));
+document.getElementById('openRules').addEventListener('click',()=>showView('regras'));
+document.getElementById('linkRules').addEventListener('click',e=>{e.preventDefault();showView('regras')});
+
+document.getElementById('fileDrop').addEventListener('click',()=>document.getElementById('fileInput').click());
+document.getElementById('fileDrop').addEventListener('dragover',e=>{e.preventDefault();document.getElementById('fileDrop').style.background='#fff8'});
+document.getElementById('fileDrop').addEventListener('dragleave',e=>{e.preventDefault();document.getElementById('fileDrop').style.background=''});
+document.getElementById('fileInput').addEventListener('change',(e)=>{const f=e.target.files[0];document.getElementById('fileDrop').textContent = f ? f.name : 'Arraste e solte ou clique para escolher';});
+
+document.getElementById('postBtn').addEventListener('click',async()=>{
+  if(!state.currentUser){ alert('Faça login para postar'); showAuth(); return; }
+  const fileInput=document.getElementById('fileInput');
+  if(!fileInput.files.length) { alert('Escolha um arquivo'); return; }
+  const file=fileInput.files[0];
+  const title=document.getElementById('titleInput').value.trim();
+  const desc=document.getElementById('descInput').value.trim();
+  const nsfw=document.getElementById('nsfwCheck').checked;
+  document.getElementById('uploadStatus').textContent='Enviando...';
+  const url = await uploadToCloudinary(file);
+  const m = {
+    id: uid(),
+    title,
+    description: desc,
+    mediaUrl: url,
+    mediaType: file.type,
+    author: state.currentUser.username,
+    authorPhoto: state.currentUser.photo,
+    createdAt: new Date().toISOString(),
+    likes: [],
+    comments: [],
+    reports: [],
+    nsfw
+  };
+  state.memes.unshift(m);
+  save();
+  document.getElementById('uploadStatus').textContent='Postado com sucesso!';
+  document.getElementById('fileInput').value=''; document.getElementById('titleInput').value=''; document.getElementById('descInput').value=''; document.getElementById('fileDrop').textContent='Arraste e solte ou clique para escolher (PNG, JPG, MP4, WEBM, MP3)';
+  showView('feed');
+});
+
+async function uploadToCloudinary(file){
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', UPLOAD_PRESET);
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, { method:'POST', body:fd });
+  const data = await res.json();
+  if(data.secure_url) return data.secure_url;
+  throw new Error('Upload failed');
+}
+
+function renderAll(){
+  renderHeader();
+  renderFeed();
+  renderMyMemes();
+  renderReports();
+  renderRight();
+  document.getElementById('totalUsers').textContent = Object.keys(state.users).length;
+}
+function renderHeader(){
+  const u = state.currentUser || { username:'Convidado', photo:'https://i.pravatar.cc/44?u=guest' };
+  document.getElementById('sidebarName').textContent = u.username;
+  document.getElementById('sidebarMeta').textContent = u.isAdmin ? 'Administrador' : 'Membro';
+  document.getElementById('sidebarAvatar').src = u.photo || 'https://i.pravatar.cc/100?u='+u.username;
+  document.getElementById('topAvatar').src = u.photo || 'https://i.pravatar.cc/44?u='+u.username;
+  document.getElementById('profileName').textContent = u.username;
+  document.getElementById('profilePicLarge').src = u.photo || 'https://i.pravatar.cc/140?u='+u.username;
+  document.getElementById('profileBio').textContent = u.bio || 'Sem biografia.';
+  document.getElementById('followBtn').textContent = (state.currentUser && state.currentUser.username !== u.username && (state.followers[u.username]||[]).includes(state.currentUser.username)) ? 'Seguindo' : 'Seguir';
+}
+
+function renderFeed(filter='all',query=''){
+  const container = document.getElementById('feedGrid');
+  container.innerHTML='';
+  let list = state.memes.filter(m=>!m.deleted);
+  if(filter!=='all') {
+    if(filter==='image') list = list.filter(x=>x.mediaType.startsWith('image/'));
+    if(filter==='video') list = list.filter(x=>x.mediaType.startsWith('video/'));
+    if(filter==='audio') list = list.filter(x=>x.mediaType.startsWith('audio/'));
+  }
+  if(query) {
+    const q=query.toLowerCase();
+    list = list.filter(m=> (m.title||'').toLowerCase().includes(q) || (m.description||'').toLowerCase().includes(q) || m.author.toLowerCase().includes(q) );
+  }
+  list.forEach(m=>{
+    const div=document.createElement('div');
+    div.className='card';
+    const mediaDiv=document.createElement('div');
+    mediaDiv.className='media';
+    if(m.mediaType.startsWith('image/')) mediaDiv.innerHTML = `<img loading="lazy" src="${m.mediaUrl}" alt="${escapeHtml(m.title||'')}" />`;
+    else if(m.mediaType.startsWith('video/')) mediaDiv.innerHTML = `<video controls src="${m.mediaUrl}"></video>`;
+    else if(m.mediaType.startsWith('audio/')) mediaDiv.innerHTML = `<audio controls src="${m.mediaUrl} style="width:100%"></audio>`;
+    const pTitle=document.createElement('div'); pTitle.style.fontWeight=800; pTitle.textContent = m.title || '';
+    const pDesc=document.createElement('p'); pDesc.textContent = m.description || '';
+    const meta=document.createElement('div'); meta.className='meta';
+    meta.innerHTML = `<img src="${m.authorPhoto||'https://i.pravatar.cc/44?u='+m.author}" /><div><div class="who">${m.author}</div><div class="when">${new Date(m.createdAt).toLocaleString()}</div></div>`;
+    const actions=document.createElement('div'); actions.className='actions';
+    const likeBtn=document.createElement('button'); likeBtn.className='icon-btn like'; likeBtn.innerHTML = `❤️ <span class="count">${m.likes.length}</span>`;
+    likeBtn.onclick = () => toggleLike(m.id);
+    const commentBtn=document.createElement('button'); commentBtn.className='icon-btn'; commentBtn.textContent = `💬 ${m.comments.length}`;
+    commentBtn.onclick = ()=> openComments(m.id);
+    const reportBtn=document.createElement('button'); reportBtn.className='icon-btn'; reportBtn.textContent = '⚠️ Denunciar';
+    reportBtn.onclick = ()=> openReportDialog(m.id);
+    const followBtn=document.createElement('button'); followBtn.className='icon-btn'; followBtn.textContent = isFollowing(state.currentUser?.username, m.author) ? 'Seguindo' : 'Seguir';
+    followBtn.onclick = ()=> toggleFollow(m.author);
+    actions.appendChild(likeBtn); actions.appendChild(commentBtn); actions.appendChild(reportBtn); actions.appendChild(followBtn);
+
+    div.appendChild(mediaDiv);
+    if(m.title) div.appendChild(pTitle);
+    div.appendChild(pDesc);
+    div.appendChild(meta);
+    div.appendChild(actions);
+
+    const commentsDiv=document.createElement('div'); commentsDiv.className='comment-section';
+    const commentsHeader=document.createElement('div'); commentsHeader.textContent = `Comentários (${m.comments.length})`; commentsHeader.style.marginTop='6px'; commentsHeader.style.fontWeight='700';
+    const commentsList=document.createElement('div'); commentsList.style.marginTop='6px';
+    m.comments.forEach(c=>{
+      const p=document.createElement('p'); p.textContent = `${c.user}: ${c.text}`; commentsList.appendChild(p);
+    });
+    const form=document.createElement('form'); form.onsubmit=(e)=>{ e.preventDefault(); const txt = form.querySelector('input').value.trim(); if(!state.currentUser){ alert('Faça login'); showAuth(); return; } if(txt){ m.comments.push({ id:uid(), user:state.currentUser.username, text:txt, at:new Date().toISOString() }); save(); } }
+    const input=document.createElement('input'); input.placeholder='Comentar...'; input.className='input-sm';
+    const submit=document.createElement('button'); submit.className='btn'; submit.textContent='Comentar';
+    form.appendChild(input); form.appendChild(submit);
+    commentsDiv.appendChild(commentsHeader); commentsDiv.appendChild(commentsList); commentsDiv.appendChild(form);
+    div.appendChild(commentsDiv);
+
+    container.appendChild(div);
+  });
+}
+
+function renderMyMemes(){
+  const container=document.getElementById('myMemesGrid');
+  container.innerHTML='';
+  if(!state.currentUser) { container.innerHTML = '<div style="color:var(--muted)">Faça login para ver seus memes.</div>'; return;}
+  const list = state.memes.filter(m=>m.author===state.currentUser.username && !m.deleted);
+  if(!list.length){ container.innerHTML = '<div style="color:var(--muted)">Você ainda não postou memes.</div>'; return;}
+  list.forEach(m=>{
+    const div=document.createElement('div'); div.className='card';
+    const media=document.createElement('div'); media.className='media';
+    if(m.mediaType.startsWith('image/')) media.innerHTML=`<img src="${m.mediaUrl}" />`;
+    else if(m.mediaType.startsWith('video/')) media.innerHTML=`<video src="${m.mediaUrl}" controls></video>`;
+    else media.innerHTML=`<audio src="${m.mediaUrl}" controls></audio>`;
+    const t=document.createElement('div'); t.style.fontWeight=700; t.textContent = m.title || '';
+    const btns=document.createElement('div'); btns.style.display='flex'; btns.style.gap='8px';
+    const del=document.createElement('button'); del.className='btn ghost'; del.textContent='Excluir'; del.onclick=()=>{ if(confirm('Excluir meme?')){ m.deleted=true; save(); } };
+    btns.appendChild(del);
+    div.appendChild(media); if(m.title) div.appendChild(t); div.appendChild(btns);
+    container.appendChild(div);
+  });
+}
+
+function renderReports(){
+  const container=document.getElementById('reportsList');
+  container.innerHTML='';
+  if(!state.reports.length){ container.innerHTML = '<div style="color:var(--muted)">Nenhuma denúncia.</div>'; document.getElementById('rightReports').textContent='0'; return; }
+  document.getElementById('rightReports').textContent = state.reports.length;
+  state.reports.forEach(r=>{
+    const el=document.createElement('div'); el.className='meme-card';
+    el.style.display='flex'; el.style.gap='12px'; el.style.alignItems='flex-start';
+    const media=document.createElement('div'); media.style.width='120px'; media.style.borderRadius='8px'; media.style.overflow='hidden';
+    if(r.memeMediaType.startsWith('image/')) media.innerHTML=`<img src="${r.memeMedia}" style="width:120px;height:80px;object-fit:cover">`;
+    else if(r.memeMediaType.startsWith('video/')) media.innerHTML=`<video src="${r.memeMedia}" style="width:120px;height:80px;object-fit:cover" muted></video>`;
+    else media.innerHTML=`<audio src="${r.memeMedia}" style="width:120px"></audio>`;
+    const info=document.createElement('div'); info.style.flex='1';
+    info.innerHTML = `<div style="font-weight:800">${r.memeText||'(sem texto)'}</div><div style="color:var(--muted);font-size:13px;margin-top:6px">Denunciado por: <strong>${r.reporter}</strong> em ${new Date(r.timestamp).toLocaleString()}</div><div style="margin-top:8px;color:var(--muted)"><strong>Motivo:</strong> ${r.reason}</div>`;
+    const actions=document.createElement('div'); actions.style.display='flex'; actions.style.flexDirection='column'; actions.style.gap='8px';
+    const viewBtn=document.createElement('button'); viewBtn.className='btn'; viewBtn.textContent='Ver'; viewBtn.onclick=()=>openReportModal(r.id);
+    const removeBtn=document.createElement('button'); removeBtn.className='btn ghost'; removeBtn.textContent='Remover denúncia'; removeBtn.onclick=()=>{ if(!isAdmin()) { alert('Apenas admins'); return;} state.reports = state.reports.filter(x=>x.id!==r.id); save();};
+    actions.appendChild(viewBtn); actions.appendChild(removeBtn);
+    el.appendChild(media); el.appendChild(info); el.appendChild(actions);
+    container.appendChild(el);
+  });
+}
+
+function renderRight(){
+  // small list of pending reports
+  const pending = state.reports.slice(0,3).map(r=>`<div style="padding:8px;border-radius:10px;background:#fff;margin-bottom:6px"><strong>${r.reporter}</strong> → ${r.memeUser}</div>`).join('');
+  document.getElementById('rightReports').innerHTML = pending || 'Nenhuma denuncia pendente';
+}
+
+/* interactions */
+function openReportDialog(memeId){
+  const reason = prompt('Informe o motivo da denúncia:');
+  if(!reason) return;
+  if(!state.currentUser){ alert('Faça login'); showAuth(); return; }
+  const meme = state.memes.find(m=>m.id===memeId);
+  if(!meme) return;
+  const r = {
+    id: uid(),
+    memeId: meme.id,
+    reporter: state.currentUser.username,
+    reason,
+    memeUser: meme.author,
+    memeText: meme.title || meme.description || '',
+    memeMedia: meme.mediaUrl,
+    memeMediaType: meme.mediaType,
+    timestamp: new Date().toISOString()
+  };
+  state.reports.unshift(r);
+  meme.reports.push(r.id);
+  save();
+  alert('Denúncia registrada. Obrigado.');
+}
+
+let modalCurrentReport = null;
+function openReportModal(reportId){
+  if(!isAdmin()){ alert('Apenas administradores podem acessar denúncias detalhadas.'); return; }
+  modalCurrentReport = state.reports.find(r=>r.id===reportId);
+  if(!modalCurrentReport) return;
+  const m = modalCurrentReport;
+  const c = document.getElementById('modalContent');
+  c.innerHTML = `<div style="display:flex;gap:12px;align-items:flex-start"><div style="width:140px;border-radius:10px;overflow:hidden">${m.memeMediaType.startsWith('image/')?`<img src="${m.memeMedia}" style="width:140px;height:100px;object-fit:cover">`:m.memeMediaType.startsWith('video/')?`<video src="${m.memeMedia}" style="width:140px;height:100px;object-fit:cover" controls></video>`:`<audio src="${m.memeMedia}"></audio>`}</div><div style="flex:1"><div style="font-weight:800">${m.memeText||'(sem texto)'}</div><div style="color:var(--muted);margin-top:8px">Postado por: <strong>${m.memeUser}</strong></div><div style="color:var(--muted);margin-top:6px">Denunciado por: <strong>${m.reporter}</strong></div><div style="margin-top:8px;color:var(--muted)"><strong>Motivo da denúncia:</strong> ${m.reason}</div></div></div>`;
+  document.getElementById('modalReport').classList.remove('hidden');
+  document.getElementById('adminMessage').value=''; document.getElementById('adminReason').value='';
+}
+
+document.getElementById('closeModal').addEventListener('click', ()=>document.getElementById('modalReport').classList.add('hidden'));
+
+document.getElementById('banUserBtn').addEventListener('click', ()=>{
+  if(!isAdmin()){ alert('Apenas admins'); return; }
+  if(!modalCurrentReport) return;
+  const u = modalCurrentReport.memeUser;
+  if(!confirm(`Banir usuário ${u}?`)) return;
+  state.users[u] = state.users[u] || {};
+  state.users[u].banned = true;
+  state.memes.forEach(m=>{ if(m.author===u) m.deleted=true; });
+  state.reports = state.reports.filter(r=>r.memeUser!==u);
+  save();
+  document.getElementById('modalReport').classList.add('hidden');
+  alert(`Usuário ${u} banido.`);
+});
+
+document.getElementById('deleteMemeBtn').addEventListener('click', ()=>{
+  if(!isAdmin()){ alert('Apenas admins'); return; }
+  if(!modalCurrentReport) return;
+  const memeId = modalCurrentReport.memeId;
+  const reason = document.getElementById('adminReason').value || 'Violação';
+  const message = document.getElementById('adminMessage').value || '';
+  const m = state.memes.find(x=>x.id===memeId);
+  if(!m) return;
+  if(confirm('Excluir este meme permanentemente?')){
+    m.deleted = true;
+    state.reports = state.reports.filter(r=>r.memeId!==memeId);
+    save();
+    document.getElementById('modalReport').classList.add('hidden');
+    alert('Meme excluído. Mensagem enviada ao autor: ' + message);
+  }
+});
+
+document.getElementById('removeReportBtn').addEventListener('click', ()=>{
+  if(!isAdmin()){ alert('Apenas admins'); return; }
+  if(!modalCurrentReport) return;
+  state.reports = state.reports.filter(r=>r.id!==modalCurrentReport.id);
+  save();
+  document.getElementById('modalReport').classList.add('hidden');
+  alert('Denúncia removida.');
+});
+
+function toggleLike(memeId){
+  if(!state.currentUser){ alert('Faça login'); showAuth(); return; }
+  const m = state.memes.find(x=>x.id===memeId);
+  if(!m) return;
+  const u = state.currentUser.username;
+  if(m.likes.includes(u)){ m.likes = m.likes.filter(x=>x!==u); } else m.likes.push(u);
+  save();
+}
+
+function openComments(memeId){
+  alert('Foco nos comentários: role até o card e use o formulário de comentário.');
+}
+
+function toggleFollow(target){
+  if(!state.currentUser){ alert('Faça login'); showAuth(); return; }
+  const me = state.currentUser.username;
+  state.followers[target] = state.followers[target] || [];
+  if(state.followers[target].includes(me)) state.followers[target] = state.followers[target].filter(x=>x!==me);
+  else state.followers[target].push(me);
+  save();
+}
+
+function isFollowing(me,target){
+  if(!me) return false;
+  return (state.followers[target]||[]).includes(me);
+}
+
+/* Auth UI */
+function showAuth(){
+  const username = prompt('Usuário:');
+  if(!username) return;
+  const pass = prompt('Senha:');
+  if(!pass) return;
+  const secret = prompt('Código admin (opcional):');
+  if(!state.users[username]) {
+    if(!confirm('Usuário não existe. Criar conta?')) return;
+    const photo = 'https://i.pravatar.cc/150?u='+username;
+    state.users[username] = { username, password:pass, photo, isAdmin:false, bio:'' };
+  }
+  if(state.users[username].password !== pass){ alert('Senha incorreta'); return; }
+  if(secret && secret === ADMIN_SECRET) state.users[username].isAdmin = true;
+  state.currentUser = { username: username, photo: state.users[username].photo, isAdmin: !!state.users[username].isAdmin, bio: state.users[username].bio||'' };
+  save();
+  alert('Bem-vindo, '+username+(state.currentUser.isAdmin ? ' (admin)' : ''));
+}
+
+/* Assign admin code flow */
+function assignAdminByCode(){
+  const user = prompt('Qual usuário receberá privilégio admin?');
+  if(!user) return;
+  const code = prompt('Insira o código secreto para tornar admin:');
+  if(code !== ADMIN_SECRET){ alert('Código inválido'); return; }
+  state.users[user] = state.users[user] || { username:user, password:'', photo:'https://i.pravatar.cc/150?u='+user, isAdmin:false };
+  state.users[user].isAdmin = true;
+  save();
+  alert(user + ' é agora administrador.');
+}
+
+/* small controls */
+document.getElementById('refreshFeed').addEventListener('click', ()=>renderFeed(document.getElementById('filterType').value,document.getElementById('searchInput').value));
+document.getElementById('searchInput').addEventListener('input', e=>renderFeed(document.getElementById('filterType').value,e.target.value));
+document.getElementById('filterType').addEventListener('change', e=>renderFeed(e.target.value,document.getElementById('searchInput').value));
+document.getElementById('clearForm').addEventListener('click', ()=>{ document.getElementById('fileInput').value=''; document.getElementById('titleInput').value=''; document.getElementById('descInput').value=''; document.getElementById('fileDrop').textContent='Arraste e solte ou clique para escolher (PNG, JPG, MP4, WEBM, MP3)'; });
+document.getElementById('logout').addEventListener('click', ()=>{ state.currentUser = null; save(); });
+
+document.getElementById('followBtn').addEventListener('click', ()=>{
+  if(!state.currentUser){ showAuth(); return; }
+  alert('Seguir funcionalidade no perfil.');
+});
+
+function isAdmin(){ return state.currentUser && state.currentUser.isAdmin; }
+
+function escapeHtml(s){ if(!s) return ''; return s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* initial seed and demo */
+if(!state.memes.length){
+  state.memes.push({
+    id:uid(), title:'Quando o deploy finalmente da certo', description:'Aquela sensação...', mediaUrl:'https://res.cloudinary.com/demo/image/upload/w_800,h_450,c_fill/kitten.jpg', mediaType:'image/jpeg', author:'admin', authorPhoto:state.users['admin'].photo, createdAt:new Date().toISOString(), likes:[],comments:[],reports:[],nsfw:false
+  });
+  save();
+}
+
+renderAll();
+
+/* expose some utilities for console/testing */
+window._CM = {state, save, assignAdminByCode, showAuth};
+
+</script>
+
+</body>
+</html>
